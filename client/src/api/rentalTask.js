@@ -11,3 +11,7 @@ export const getRentalTasksGrouped = () => {
 export const getRentalTaskDetail = (id) => {
   return request.get(`/rental-tasks/${id}`)
 }
+
+export const confirmDelivery = (id, data) => {
+  return request.put(`/rental-tasks/${id}/delivery`, data)
+}

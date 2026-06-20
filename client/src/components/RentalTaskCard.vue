@@ -94,8 +94,8 @@
         <span class="stat-value">¥{{ task.monthlyFee }}/月</span>
       </div>
       <div class="card-actions">
-        <button class="action-btn detail-btn">查看详情</button>
-        <button class="action-btn primary-btn">处理任务</button>
+        <button class="action-btn detail-btn" @click="handleViewDetail">查看详情</button>
+        <button class="action-btn primary-btn" @click="handleProcess">处理任务</button>
       </div>
     </div>
   </div>
@@ -103,6 +103,7 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 
 const props = defineProps({
   task: {
@@ -110,6 +111,20 @@ const props = defineProps({
     required: true
   }
 })
+
+const router = useRouter()
+
+const handleProcess = () => {
+  if (props.task.type === 'delivery') {
+    router.push(`/rental-tasks/delivery/${props.task.id}`)
+  }
+}
+
+const handleViewDetail = () => {
+  if (props.task.type === 'delivery') {
+    router.push(`/rental-tasks/delivery/${props.task.id}`)
+  }
+}
 
 const priorityText = computed(() => {
   const map = {

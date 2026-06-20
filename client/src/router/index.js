@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import MyTasks from '../views/MyTasks.vue'
 import RentalTasks from '../views/RentalTasks.vue'
+import DeliveryTaskDetail from '../views/DeliveryTaskDetail.vue'
 
 const routes = [
   {
@@ -16,6 +17,11 @@ const routes = [
     path: '/rental-tasks',
     name: 'RentalTasks',
     component: RentalTasks
+  },
+  {
+    path: '/rental-tasks/delivery/:id',
+    name: 'DeliveryTaskDetail',
+    component: DeliveryTaskDetail
   }
 ]
 

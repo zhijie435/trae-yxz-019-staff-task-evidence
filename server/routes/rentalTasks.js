@@ -108,4 +108,37 @@ router.get('/:id', (req, res) => {
   }
 })
 
+router.put('/:id/delivery', (req, res) => {
+  const taskId = parseInt(req.params.id)
+  const { deliveryPhotos, deliveryRemark, actualDeliveryTime } = req.body
+  const taskIndex = rentalTasks.findIndex(t => t.id === taskId)
+
+  if (taskIndex === -1) {
+    return res.status(404).json({
+      code: 404,
+      message: '任务不存在'
+    })
+  }
+
+  const task = rentalTasks[taskIndex]
+  if (task.type !== 'delivery') {
+    return res.status(400).json({
+      code: 400,
+      message: '该任务不是交付任务'
+    })
+  }
+
+  task.status = 'completed'
+  task.statusText = '已交付'
+  task.actualDeliveryTime = actualDeliveryTime || new Date().toLocaleString('zh-CN', { hour12: false }).replace(/\//g, '-')
+  task.deliveryPhotos = deliveryPhotos || []
+  task.deliveryRemark = deliveryRemark || ''
+
+  res.json({
+    code: 0,
+    message: '交付确认成功',
+    data: task
+  })
+})
+
 module.exports = router
