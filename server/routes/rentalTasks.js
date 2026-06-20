@@ -134,10 +134,52 @@ router.put('/:id/delivery', (req, res) => {
   task.deliveryPhotos = deliveryPhotos || []
   task.deliveryRemark = deliveryRemark || ''
 
+  const now = new Date()
+  const nowStr = now.toLocaleString('zh-CN', { hour12: false }).replace(/\//g, '-')
+  const dateStr = now.toISOString().split('T')[0].replace(/-/g, '')
+
+  const maxId = rentalTasks.reduce((max, t) => Math.max(max, t.id), 0)
+  const newTaskId = Math.max(2000, maxId) + 1
+
+  const rentalStartDate = now.toISOString().split('T')[0]
+  const rentalEndDate = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+  const nextCheckTime = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + ' 10:00:00'
+
+  const monthlyFee = task.monthlyFee || (task.itemCount * 100)
+
+  const newRentingTask = {
+    id: newTaskId,
+    title: `设备租赁跟踪-${dateStr}${String(newTaskId).slice(-3)}`,
+    type: 'renting',
+    typeText: '租赁中任务',
+    description: `${task.customerName}租赁的${task.itemName}日常巡检`,
+    itemName: task.itemName,
+    itemCount: task.itemCount,
+    customerName: task.customerName,
+    customerContact: task.customerContact,
+    customerPhone: task.customerPhone,
+    rentalStartDate,
+    rentalEndDate,
+    monthlyFee,
+    status: 'processing',
+    statusText: '租赁中',
+    priority: task.priority,
+    priorityText: task.priorityText,
+    createTime: nowStr,
+    lastCheckTime: nowStr,
+    nextCheckTime,
+    assignee: task.assignee || '赵运维'
+  }
+
+  rentalTasks.push(newRentingTask)
+
   res.json({
     code: 0,
-    message: '交付确认成功',
-    data: task
+    message: '交付确认成功，租赁中任务已创建',
+    data: {
+      completedTask: task,
+      rentingTask: newRentingTask
+    }
   })
 })
 

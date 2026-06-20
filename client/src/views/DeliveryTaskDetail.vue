@@ -239,7 +239,7 @@
       <div class="modal-content success-modal" @click.stop>
         <div class="success-icon">✅</div>
         <h3 class="success-title">交付成功！</h3>
-        <p class="success-message">任务已标记为已交付状态</p>
+        <p class="success-message">任务已标记为已交付状态，租赁中任务已自动创建</p>
         <button class="success-btn" @click="goBack">返回列表</button>
       </div>
     </div>
