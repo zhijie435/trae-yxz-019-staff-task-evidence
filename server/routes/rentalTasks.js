@@ -380,4 +380,54 @@ router.put('/:id/deposit-refund', (req, res) => {
   })
 })
 
+router.put('/:id/repair', (req, res) => {
+  const taskId = parseInt(req.params.id)
+  const { repairResult, repairCost, actualRepairTime, repairPhotos, repairRemark } = req.body
+  const taskIndex = rentalTasks.findIndex(t => t.id === taskId)
+
+  if (taskIndex === -1) {
+    return res.status(404).json({
+      code: 404,
+      message: '任务不存在'
+    })
+  }
+
+  const task = rentalTasks[taskIndex]
+  if (task.type !== 'repair') {
+    return res.status(400).json({
+      code: 400,
+      message: '该任务不是报修任务'
+    })
+  }
+
+  task.status = 'completed'
+  task.statusText = '已完成'
+  task.actualRepairTime = actualRepairTime || new Date().toLocaleString('zh-CN', { hour12: false }).replace(/\//g, '-')
+  task.repairResult = repairResult || '设备已维修完成'
+  task.repairCost = repairCost || 0
+  task.repairPhotos = repairPhotos || []
+  task.repairRemark = repairRemark || ''
+
+  const relatedRentingTask = rentalTasks.find(t =>
+    t.type === 'renting' &&
+    t.customerName === task.customerName &&
+    t.itemName === task.itemName &&
+    t.inAfterSales
+  )
+
+  if (relatedRentingTask) {
+    relatedRentingTask.inAfterSales = false
+    relatedRentingTask.statusText = '租赁中'
+  }
+
+  res.json({
+    code: 0,
+    message: '维修确认成功，售后中状态已关闭',
+    data: {
+      completedTask: task,
+      updatedRentingTask: relatedRentingTask || null
+    }
+  })
+})
+
 module.exports = router

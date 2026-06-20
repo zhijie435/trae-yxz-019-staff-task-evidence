@@ -4,6 +4,7 @@ import RentalTasks from '../views/RentalTasks.vue'
 import DeliveryTaskDetail from '../views/DeliveryTaskDetail.vue'
 import AcceptanceTaskDetail from '../views/AcceptanceTaskDetail.vue'
 import DepositRefundTaskDetail from '../views/DepositRefundTaskDetail.vue'
+import RepairTaskDetail from '../views/RepairTaskDetail.vue'
 import RentalTaskDetail from '../views/RentalTaskDetail.vue'
 
 const routes = [
@@ -35,6 +36,11 @@ const routes = [
     path: '/rental-tasks/deposit-refund/:id',
     name: 'DepositRefundTaskDetail',
     component: DepositRefundTaskDetail
+  },
+  {
+    path: '/rental-tasks/repair/:id',
+    name: 'RepairTaskDetail',
+    component: RepairTaskDetail
   },
   {
     path: '/rental-tasks/detail/:id',

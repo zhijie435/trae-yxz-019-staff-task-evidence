@@ -125,6 +125,8 @@ const handleProcess = () => {
     router.push(`/rental-tasks/acceptance/${props.task.id}`)
   } else if (props.task.type === 'depositRefund') {
     router.push(`/rental-tasks/deposit-refund/${props.task.id}`)
+  } else if (props.task.type === 'repair') {
+    router.push(`/rental-tasks/repair/${props.task.id}`)
   } else {
     router.push(`/rental-tasks/detail/${props.task.id}`)
   }

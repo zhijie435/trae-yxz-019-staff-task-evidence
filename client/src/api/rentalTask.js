@@ -24,6 +24,10 @@ export const confirmDepositRefund = (id, data) => {
   return request.put(`/rental-tasks/${id}/deposit-refund`, data)
 }
 
+export const confirmRepair = (id, data) => {
+  return request.put(`/rental-tasks/${id}/repair`, data)
+}
+
 export const getTaskOperationLogs = (id) => {
   return request.get(`/rental-tasks/${id}/operation-logs`)
 }
