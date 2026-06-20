@@ -7,7 +7,8 @@ const typeMap = {
   delivery: 'delivery',
   renting: 'renting',
   acceptance: 'acceptance',
-  repair: 'repair'
+  repair: 'repair',
+  depositRefund: 'depositRefund'
 }
 
 const typeTextMap = {
@@ -15,7 +16,8 @@ const typeTextMap = {
   delivery: '交付任务',
   renting: '租赁中任务',
   acceptance: '验收任务',
-  repair: '报修任务'
+  repair: '报修任务',
+  depositRefund: '押金退还任务'
 }
 
 router.get('/', (req, res) => {
@@ -41,7 +43,8 @@ router.get('/', (req, res) => {
     delivery: rentalTasks.filter(t => t.type === 'delivery').length,
     renting: rentalTasks.filter(t => t.type === 'renting').length,
     acceptance: rentalTasks.filter(t => t.type === 'acceptance').length,
-    repair: rentalTasks.filter(t => t.type === 'repair').length
+    repair: rentalTasks.filter(t => t.type === 'repair').length,
+    depositRefund: rentalTasks.filter(t => t.type === 'depositRefund').length
   }
 
   const typeStats = Object.keys(typeTextMap).map(key => ({
@@ -66,7 +69,8 @@ router.get('/grouped', (req, res) => {
     delivery: rentalTasks.filter(t => t.type === 'delivery'),
     renting: rentalTasks.filter(t => t.type === 'renting'),
     acceptance: rentalTasks.filter(t => t.type === 'acceptance'),
-    repair: rentalTasks.filter(t => t.type === 'repair')
+    repair: rentalTasks.filter(t => t.type === 'repair'),
+    depositRefund: rentalTasks.filter(t => t.type === 'depositRefund')
   }
 
   const stats = {
@@ -74,7 +78,8 @@ router.get('/grouped', (req, res) => {
     delivery: grouped.delivery.length,
     renting: grouped.renting.length,
     acceptance: grouped.acceptance.length,
-    repair: grouped.repair.length
+    repair: grouped.repair.length,
+    depositRefund: grouped.depositRefund.length
   }
 
   res.json({
@@ -85,6 +90,7 @@ router.get('/grouped', (req, res) => {
         { type: 'delivery', typeText: '交付任务', list: grouped.delivery, count: grouped.delivery.length },
         { type: 'renting', typeText: '租赁中任务', list: grouped.renting, count: grouped.renting.length },
         { type: 'acceptance', typeText: '验收任务', list: grouped.acceptance, count: grouped.acceptance.length },
+        { type: 'depositRefund', typeText: '押金退还任务', list: grouped.depositRefund, count: grouped.depositRefund.length },
         { type: 'repair', typeText: '报修任务', list: grouped.repair, count: grouped.repair.length }
       ],
       stats
@@ -214,10 +220,50 @@ router.put('/:id/acceptance', (req, res) => {
   task.damageFee = damageFee || 0
   task.acceptanceRemark = acceptanceRemark || ''
 
+  const now = new Date()
+  const nowStr = now.toLocaleString('zh-CN', { hour12: false }).replace(/\//g, '-')
+  const dateStr = now.toISOString().split('T')[0].replace(/-/g, '')
+
+  const maxId = rentalTasks.reduce((max, t) => Math.max(max, t.id), 0)
+  const newTaskId = Math.max(5000, maxId) + 1
+
+  const depositAmount = task.depositAmount || (task.itemCount * 500)
+  const actualRefundAmount = Math.max(0, depositAmount - (damageFee || 0))
+
+  const newDepositRefundTask = {
+    id: newTaskId,
+    title: `押金退还-${dateStr}${String(newTaskId).slice(-3)}`,
+    type: 'depositRefund',
+    typeText: '押金退还任务',
+    description: `${task.customerName}租赁${task.itemName}押金退还`,
+    itemName: task.itemName,
+    itemCount: task.itemCount,
+    customerName: task.customerName,
+    customerContact: task.customerContact,
+    customerPhone: task.customerPhone,
+    depositAmount,
+    damageFee: damageFee || 0,
+    actualRefundAmount,
+    rentalStartDate: task.rentalStartDate,
+    rentalEndDate: task.rentalEndDate,
+    acceptanceResult: acceptanceResult || '设备完好，无损坏',
+    status: 'pending',
+    statusText: '待退还',
+    priority: task.priority,
+    priorityText: task.priorityText,
+    createTime: nowStr,
+    assignee: '钱财务'
+  }
+
+  rentalTasks.push(newDepositRefundTask)
+
   res.json({
     code: 0,
-    message: '验收确认成功',
-    data: task
+    message: '验收确认成功，押金退还任务已创建',
+    data: {
+      completedTask: task,
+      depositRefundTask: newDepositRefundTask
+    }
   })
 })
 
@@ -283,6 +329,10 @@ function generateOperationLogs(task) {
       completeType = 'inspect'
       completeTitle = '巡检完成'
       completeDesc = '设备巡检完成，状态正常'
+    } else if (task.type === 'depositRefund') {
+      completeType = 'refund'
+      completeTitle = '押金已退还'
+      completeDesc = `押金已退还，实际退还金额¥${task.actualRefundAmount || task.depositAmount || 0}`
     }
 
     logs.push({
@@ -296,5 +346,38 @@ function generateOperationLogs(task) {
 
   return logs
 }
+
+router.put('/:id/deposit-refund', (req, res) => {
+  const taskId = parseInt(req.params.id)
+  const { refundRemark, actualRefundTime, refundVoucher } = req.body
+  const taskIndex = rentalTasks.findIndex(t => t.id === taskId)
+
+  if (taskIndex === -1) {
+    return res.status(404).json({
+      code: 404,
+      message: '任务不存在'
+    })
+  }
+
+  const task = rentalTasks[taskIndex]
+  if (task.type !== 'depositRefund') {
+    return res.status(400).json({
+      code: 400,
+      message: '该任务不是押金退还任务'
+    })
+  }
+
+  task.status = 'completed'
+  task.statusText = '已退还'
+  task.actualRefundTime = actualRefundTime || new Date().toLocaleString('zh-CN', { hour12: false }).replace(/\//g, '-')
+  task.refundRemark = refundRemark || ''
+  task.refundVoucher = refundVoucher || []
+
+  res.json({
+    code: 0,
+    message: '押金退还确认成功',
+    data: task
+  })
+})
 
 module.exports = router

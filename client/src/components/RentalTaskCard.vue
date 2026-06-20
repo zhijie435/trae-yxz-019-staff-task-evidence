@@ -93,6 +93,10 @@
         <span class="stat-label">月租金</span>
         <span class="stat-value">¥{{ task.monthlyFee }}/月</span>
       </div>
+      <div v-if="task.actualRefundAmount !== undefined" class="footer-stat refund-amount">
+        <span class="stat-label">退还押金</span>
+        <span class="stat-value">¥{{ task.actualRefundAmount }}</span>
+      </div>
       <div class="card-actions">
         <button class="action-btn detail-btn" @click="handleViewDetail">查看详情</button>
         <button class="action-btn primary-btn" @click="handleProcess">处理任务</button>
@@ -119,6 +123,8 @@ const handleProcess = () => {
     router.push(`/rental-tasks/delivery/${props.task.id}`)
   } else if (props.task.type === 'acceptance') {
     router.push(`/rental-tasks/acceptance/${props.task.id}`)
+  } else if (props.task.type === 'depositRefund') {
+    router.push(`/rental-tasks/deposit-refund/${props.task.id}`)
   } else {
     router.push(`/rental-tasks/detail/${props.task.id}`)
   }
@@ -167,6 +173,11 @@ const mainTimeLabel = computed(() => {
   }
   if (task.type === 'renting') {
     return `租赁周期：${task.rentalStartDate} ~ ${task.rentalEndDate}`
+  }
+  if (task.type === 'depositRefund') {
+    return task.actualRefundTime
+      ? `实际退还：${task.actualRefundTime}`
+      : `待退还押金`
   }
   return task.createTime
 })
@@ -263,6 +274,12 @@ const mainTimeLabel = computed(() => {
   background: linear-gradient(135deg, #fff1f0 0%, #ffe4e3 100%);
   color: #f5222d;
   border-color: #ffa39e;
+}
+
+.task-type-tag.depositRefund {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  color: #16a34a;
+  border-color: #86efac;
 }
 
 .priority-tag {
@@ -478,6 +495,11 @@ const mainTimeLabel = computed(() => {
 .footer-stat.monthly-fee {
   background: #eff6ff;
   color: #1d4ed8;
+}
+
+.footer-stat.refund-amount {
+  background: #ecfdf5;
+  color: #059669;
 }
 
 .stat-label {

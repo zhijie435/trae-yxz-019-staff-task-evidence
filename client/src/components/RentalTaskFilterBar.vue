@@ -35,6 +35,7 @@ const props = defineProps({
       delivery: 0,
       renting: 0,
       acceptance: 0,
+      depositRefund: 0,
       repair: 0
     })
   }
@@ -47,6 +48,7 @@ const tabs = [
   { key: 'delivery', label: '交付任务', icon: '🚚' },
   { key: 'renting', label: '租赁中任务', icon: '📦' },
   { key: 'acceptance', label: '验收任务', icon: '✅' },
+  { key: 'depositRefund', label: '押金退还', icon: '💰' },
   { key: 'repair', label: '报修任务', icon: '🔧' }
 ]
 
@@ -78,7 +80,7 @@ const handleTabClick = (key) => {
 
 .filter-tabs {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 8px;
 }
 
@@ -180,6 +182,15 @@ const handleTabClick = (key) => {
 .filter-tab.active .tab-icon.acceptance {
   background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
   box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.tab-icon.depositRefund {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+}
+
+.filter-tab.active .tab-icon.depositRefund {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
 .tab-icon.repair {
@@ -287,6 +298,16 @@ const handleTabClick = (key) => {
 .filter-tab.active .tab-count.acceptance {
   background: #ffffff;
   color: #d97706;
+}
+
+.tab-count.depositRefund {
+  background: #d1fae5;
+  color: #059669;
+}
+
+.filter-tab.active .tab-count.depositRefund {
+  background: #ffffff;
+  color: #059669;
 }
 
 .tab-count.repair {

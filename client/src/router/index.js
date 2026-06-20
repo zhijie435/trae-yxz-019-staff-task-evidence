@@ -3,6 +3,7 @@ import MyTasks from '../views/MyTasks.vue'
 import RentalTasks from '../views/RentalTasks.vue'
 import DeliveryTaskDetail from '../views/DeliveryTaskDetail.vue'
 import AcceptanceTaskDetail from '../views/AcceptanceTaskDetail.vue'
+import DepositRefundTaskDetail from '../views/DepositRefundTaskDetail.vue'
 import RentalTaskDetail from '../views/RentalTaskDetail.vue'
 
 const routes = [
@@ -29,6 +30,11 @@ const routes = [
     path: '/rental-tasks/acceptance/:id',
     name: 'AcceptanceTaskDetail',
     component: AcceptanceTaskDetail
+  },
+  {
+    path: '/rental-tasks/deposit-refund/:id',
+    name: 'DepositRefundTaskDetail',
+    component: DepositRefundTaskDetail
   },
   {
     path: '/rental-tasks/detail/:id',

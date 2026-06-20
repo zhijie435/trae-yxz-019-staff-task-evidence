@@ -20,6 +20,10 @@ export const confirmAcceptance = (id, data) => {
   return request.put(`/rental-tasks/${id}/acceptance`, data)
 }
 
+export const confirmDepositRefund = (id, data) => {
+  return request.put(`/rental-tasks/${id}/deposit-refund`, data)
+}
+
 export const getTaskOperationLogs = (id) => {
   return request.get(`/rental-tasks/${id}/operation-logs`)
 }

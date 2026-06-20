@@ -38,6 +38,13 @@
               <div class="stat-card-value">{{ stats.acceptance }}</div>
             </div>
           </div>
+          <div class="stat-card deposit-refund">
+            <div class="stat-card-icon">💰</div>
+            <div class="stat-card-content">
+              <div class="stat-card-label">押金退还</div>
+              <div class="stat-card-value">{{ stats.depositRefund }}</div>
+            </div>
+          </div>
           <div class="stat-card repair">
             <div class="stat-card-icon">🔧</div>
             <div class="stat-card-content">
@@ -101,6 +108,7 @@ const stats = ref({
   delivery: 0,
   renting: 0,
   acceptance: 0,
+  depositRefund: 0,
   repair: 0
 })
 
@@ -109,6 +117,7 @@ const typeTextMap = {
   delivery: '交付任务',
   renting: '租赁中任务',
   acceptance: '验收任务',
+  depositRefund: '押金退还任务',
   repair: '报修任务'
 }
 
@@ -229,7 +238,7 @@ onMounted(() => {
 
 .header-stats {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 16px;
 }
 
@@ -273,6 +282,10 @@ onMounted(() => {
 
 .stat-card.acceptance .stat-card-icon {
   background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.stat-card.deposit-refund .stat-card-icon {
+  background: linear-gradient(135deg, #10b981, #059669);
 }
 
 .stat-card.repair .stat-card-icon {
