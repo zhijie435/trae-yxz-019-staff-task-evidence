@@ -117,13 +117,15 @@ const router = useRouter()
 const handleProcess = () => {
   if (props.task.type === 'delivery') {
     router.push(`/rental-tasks/delivery/${props.task.id}`)
+  } else if (props.task.type === 'acceptance') {
+    router.push(`/rental-tasks/acceptance/${props.task.id}`)
+  } else {
+    router.push(`/rental-tasks/detail/${props.task.id}`)
   }
 }
 
 const handleViewDetail = () => {
-  if (props.task.type === 'delivery') {
-    router.push(`/rental-tasks/delivery/${props.task.id}`)
-  }
+  router.push(`/rental-tasks/detail/${props.task.id}`)
 }
 
 const priorityText = computed(() => {
